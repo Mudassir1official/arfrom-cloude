@@ -1,0 +1,199 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    
+    #info {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: Arial;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 100;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="info">Point at your marker to start AR</div>
+
+<a-scene
+mindar-image="imageTargetSrc: logo.mind; uiLoading: no; warmupTolerance: 5; missTolerance: 5;"
+color-space="sRGB"
+renderer="colorManagement: true, physicallyCorrectLights, antialias: true, alpha: true"
+vr-mode-ui="enabled: false"
+device-orientation-permission-ui="enabled: false">
+
+<a-assets>
+  <img id="card" src="test.png" crossorigin="anonymous" />
+  
+  <!-- Video element with proper attributes -->
+  <video 
+    id="promoVideo"
+    src="dethnote.mp4"
+    type="video/mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+    crossorigin="anonymous"
+    webkit-playsinline="true">
+  </video>
+
+  <img id="instagramIcon" src="instagram.png" crossorigin="anonymous">
+  <img id="whatsappicon" src="whatsapp.png" crossorigin="anonymous">
+  <img id="youtubeicon" src="youtube.png" crossorigin="anonymous">
+</a-assets>
+
+<a-camera
+position="0 0 0"
+look-controls="enabled: false"
+raycaster="far: 1000">
+  <a-cursor 
+    raycaster="objects: .clickable"
+    cursor="fuse: true; fuseTimeout: 500">
+  </a-cursor>
+</a-camera>
+
+<a-entity mindar-image-target="targetIndex: 0" smooth="true" smoothCount="10">
+
+  <!-- Video Plane with stable rendering -->
+  <a-plane
+    id="videopromo"
+    position="0 0.5 0"
+    width="1"
+    height="0.552"
+    rotation="60 0 0"
+    material="src: #promoVideo; shader: flat;">
+  </a-plane>
+
+  <!-- Card Background -->
+  <a-plane
+    position="0 0 0"
+    height="0.552"
+    width="1"
+    material="src: #card; shader: flat;">
+  </a-plane>
+
+  <!-- Instagram Icon - Clickable -->
+  <a-image
+    src="#instagramIcon"
+    position="0 -0.5 0"
+    width="0.2"
+    height="0.2"
+    id="instaButton"
+    class="clickable"
+    data-url="https://instagram.com"
+    material="shader: flat;">
+  </a-image>
+
+  <!-- WhatsApp Icon - Clickable -->
+  <a-image
+    src="#whatsappicon"
+    position="-0.3 -0.5 0"
+    width="0.2"
+    height="0.2"
+    id="whatsappButton"
+    class="clickable"
+    data-url="https://whatsapp.com"
+    material="shader: flat;">
+  </a-image>
+
+  <!-- YouTube Icon - Clickable -->
+  <a-image
+    src="#youtubeicon"
+    position="0.3 -0.5 0"
+    width="0.2"
+    height="0.2"
+    id="youtubeButton"
+    class="clickable"
+    data-url="https://youtube.com"
+    material="shader: flat;">
+  </a-image>
+
+</a-entity>
+
+</a-scene>
+
+<script>
+
+// Get reference to video element
+const videoElement = document.getElementById('promoVideo');
+
+// Start video playback when scene is ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Try to play video
+  videoElement.play().catch(err => {
+    console.log('Autoplay failed:', err);
+  });
+});
+
+// Alternative: Play video when it's loaded
+videoElement.addEventListener('canplay', function() {
+  console.log('Video can play');
+  videoElement.play().catch(err => {
+    console.log('Play failed:', err);
+  });
+});
+
+// Handle video errors
+videoElement.addEventListener('error', function() {
+  console.log('Video error - check file path and format');
+});
+
+// Click handlers for social icons
+document.querySelectorAll(".clickable").forEach(element => {
+  element.addEventListener("click", function() {
+    const url = this.getAttribute("data-url");
+    if (url) {
+      console.log('Opening URL:', url);
+      window.open(url, '_blank');
+    }
+  });
+});
+
+// Specific click handlers
+document.querySelector("#instaButton").addEventListener("click", () => {
+  console.log('Instagram clicked');
+  window.open("https://instagram.com", '_blank');
+});
+
+document.querySelector("#whatsappButton").addEventListener("click", () => {
+  console.log('WhatsApp clicked');
+  window.open("https://wa.me/", '_blank');
+});
+
+document.querySelector("#youtubeButton").addEventListener("click", () => {
+  console.log('YouTube clicked');
+  window.open("https://youtube.com", '_blank');
+});
+
+// Stabilize AR tracking
+document.addEventListener('arReady', () => {
+  console.log('AR scene ready');
+  // Video should start playing now
+  videoElement.play().catch(err => {
+    console.log('Play on AR ready failed:', err);
+  });
+});
+
+</script>
+
+</body>
+</html>
